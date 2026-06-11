@@ -280,11 +280,12 @@ class PaymentSystem {
         const notifications = stored ? JSON.parse(stored) : [];
 
         const notification = {
-            id: Date.now(),
+            id: booking.id || Date.now(),
             type: 'payment',
             personName: booking.personName,
             courseName: booking.courseName,
             amount: booking.amount,
+            phone: booking.phone,
             method: booking.paymentMethod,
             timestamp: new Date().toLocaleString('ar-EG'),
             message: `${booking.personName} دفع ${booking.amount} جنيه عبر ${booking.paymentMethod}`
@@ -298,13 +299,23 @@ class PaymentSystem {
 
         localStorage.setItem('elmarsam_notifications', JSON.stringify(notifications));
 
-        // Send event to main window
+        // بث رسالة لجميع النوافذ المفتوحة
         if (window.opener) {
             window.opener.postMessage({
                 type: 'NEW_PAYMENT',
                 data: notification
             }, '*');
         }
+
+        // محاولة الاتصال بـ iframe إن وجد
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'NEW_PAYMENT',
+                data: notification
+            }, '*');
+        }
+
+        console.log('✅ تم إرسال الإشعار:', notification);
     }
 
     showSuccessMessage() {
