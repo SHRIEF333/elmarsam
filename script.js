@@ -1,13 +1,16 @@
-// Booking Management System
+// Booking Management System - نسخة متعددة الأجهزة
 class BookingManager {
     constructor() {
         this.bookings = this.loadBookings();
         this.notifications = this.loadNotifications();
         this.currentEditingId = null;
+        this.socket = null;
+        this.useServer = true;
         this.init();
     }
 
     init() {
+        this.connectToServer();
         this.setupEventListeners();
         this.setDefaultDate();
         this.renderBookings();
@@ -15,6 +18,106 @@ class BookingManager {
         this.updateNotificationsBadge();
         this.setupMessageListener();
         this.checkForNewPayments();
+    }
+
+    connectToServer() {
+        try {
+            this.socket = io();
+
+            this.socket.on('connect', () => {
+                console.log('✅ متصل بالخادم!');
+                this.updateConnectionStatus(true);
+            });
+
+            // استقبال البيانات الأولية
+            this.socket.on('initial-data', (data) => {
+                console.log('📥 استقبال البيانات من الخادم');
+                this.bookings = data.bookings || [];
+                this.notifications = data.notifications || [];
+                this.renderBookings();
+                this.updateReports();
+                this.updateNotificationsBadge();
+            });
+
+            // استقبال حجز جديد
+            this.socket.on('booking-added', (data) => {
+                console.log('🎉 حجز جديد من خادم:', data.booking);
+                
+                // التحقق من عدم التكرار
+                if (!this.bookings.find(b => b.id === data.booking.id)) {
+                    this.bookings.unshift(data.booking);
+                    this.addNotification(data.notification);
+                    this.renderBookings();
+                    this.updateReports();
+                    this.playNotificationSound();
+                    this.showNotificationAlert(data.booking);
+                }
+            });
+
+            // حذف حجز
+            this.socket.on('booking-deleted', (bookingId) => {
+                console.log('🗑️ حجز محذوف:', bookingId);
+                this.bookings = this.bookings.filter(b => b.id !== bookingId);
+                this.renderBookings();
+                this.updateReports();
+            });
+
+            // تعديل حجز
+            this.socket.on('booking-updated', (updatedBooking) => {
+                console.log('✏️ حجز معدل:', updatedBooking);
+                const index = this.bookings.findIndex(b => b.id === updatedBooking.id);
+                if (index !== -1) {
+                    this.bookings[index] = updatedBooking;
+                    this.renderBookings();
+                    this.updateReports();
+                }
+            });
+
+            // قطع الاتصال
+            this.socket.on('disconnect', () => {
+                console.log('⚠️ قطع الاتصال بالخادم');
+                this.updateConnectionStatus(false);
+            });
+
+            this.socket.on('error', () => {
+                console.log('⚠️ خطأ في الاتصال - استخدام محلي');
+                this.useServer = false;
+                this.updateConnectionStatus(false);
+            });
+
+        } catch (error) {
+            console.log('ℹ️ Socket.io غير متاح - استخدام محلي');
+            this.useServer = false;
+        }
+    }
+
+    updateConnectionStatus(connected) {
+        let statusDiv = document.getElementById('connectionStatus');
+        if (!statusDiv) {
+            statusDiv = document.createElement('div');
+            statusDiv.id = 'connectionStatus';
+            statusDiv.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                padding: 10px 15px;
+                border-radius: 5px;
+                font-weight: 600;
+                z-index: 1000;
+                font-size: 0.9em;
+            `;
+            document.body.appendChild(statusDiv);
+        }
+
+        if (connected) {
+            statusDiv.textContent = '🟢 متصل بالخادم (متعدد الأجهزة)';
+            statusDiv.style.background = '#28a745';
+            statusDiv.style.color = 'white';
+        } else {
+            statusDiv.textContent = '🔴 وضع محلي (جهاز واحد فقط)';
+            statusDiv.style.background = '#ffc107';
+            statusDiv.style.color = '#333';
+        }
     }
 
     setupEventListeners() {
