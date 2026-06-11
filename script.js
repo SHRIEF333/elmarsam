@@ -249,15 +249,25 @@ class BookingManager {
 
         bookingsToRender.forEach((booking, index) => {
             const row = document.createElement('tr');
+            
+            // إضافة animation للحجز الجديد (الأول في القائمة)
+            if (index === 0 && booking.paymentStatus === 'completed') {
+                row.classList.add('new-booking');
+            }
+            
+            const status = booking.paymentStatus === 'completed' ? '✅ مدفوع' : '⏳ في الانتظار';
+            const statusColor = booking.paymentStatus === 'completed' ? 'color: #28a745;' : 'color: #ffc107;';
+            
             row.innerHTML = `
                 <td>${index + 1}</td>
                 <td><strong>${booking.personName}</strong></td>
                 <td>${booking.courseName}</td>
-                <td>${booking.amount.toFixed(2)} ر.س</td>
+                <td>${booking.amount.toFixed(2)} ج.م</td>
                 <td>${new Date(booking.bookingDate).toLocaleDateString('ar-EG')}</td>
+                <td style="${statusColor}"><strong>${status}</strong></td>
                 <td>
-                    <button class="btn btn-sm btn-edit" onclick="manager.editBooking(${booking.id})">✏️ تعديل</button>
-                    <button class="btn btn-sm btn-delete" onclick="manager.showDeleteConfirm(${booking.id})">🗑️ حذف</button>
+                    <button class="btn btn-sm btn-edit" onclick="manager.editBooking(${booking.id})" title="تعديل">✏️</button>
+                    <button class="btn btn-sm btn-delete" onclick="manager.showDeleteConfirm(${booking.id})" title="حذف">🗑️</button>
                 </td>
             `;
             tbody.appendChild(row);
@@ -474,52 +484,161 @@ class BookingManager {
     }
 
     setupMessageListener() {
+        // استقبال الرسائل من نوافذ أخرى (payment.html)
         window.addEventListener('message', (event) => {
             if (event.data.type === 'NEW_PAYMENT') {
                 const payment = event.data.data;
                 
-                // Add notification
+                console.log('📨 رسالة جديدة من نافذة أخرى:', payment);
+                
+                // إضافة إشعار
                 this.addNotification(payment);
 
-                // Add booking if not already exists
+                // إضافة حجز جديد
                 const exists = this.bookings.find(b => b.id === payment.id);
                 if (!exists) {
-                    // Create booking from payment
                     const booking = {
                         id: payment.id,
                         personName: payment.personName,
                         courseName: payment.courseName,
                         amount: payment.amount,
+                        phone: payment.phone || '',
                         bookingDate: new Date().toISOString().split('T')[0],
-                        notes: `تم الدفع في: ${payment.timestamp}`,
-                        createdAt: payment.timestamp
+                        notes: `تم الدفع عبر: ${payment.method}`,
+                        createdAt: payment.timestamp,
+                        paymentStatus: 'completed'
                     };
                     
                     this.bookings.push(booking);
                     this.saveBookings();
                     this.renderBookings();
                     this.updateReports();
+                    
+                    // تنبيه صوتي وبصري
+                    this.playNotificationSound();
+                    this.showNotificationAlert(payment);
                 }
+            }
+        });
 
-                console.log('✅ تم استقبال دفعة جديدة:', payment);
+        // مراقبة تغييرات localStorage (للمزامنة بين التبويبات المختلفة)
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'elmarsam_notifications' || event.key === 'elmarsam_bookings') {
+                console.log('💾 تم كشف تحديث في localStorage');
+                
+                // إعادة تحميل البيانات
+                this.notifications = this.loadNotifications();
+                this.bookings = this.loadBookings();
+                
+                this.updateNotificationsBadge();
+                this.renderBookings();
+                this.updateReports();
+                
+                // التحقق من إشعارات جديدة
+                this.checkForNewNotifications();
             }
         });
     }
 
     checkForNewPayments() {
-        // Check for new payments in localStorage periodically
+        // التحقق من الدفعات الجديدة كل 1 ثانية
         setInterval(() => {
-            const notifications = this.loadNotifications();
-            if (notifications.length > this.notifications.length) {
-                // There are new notifications
-                const newNotifications = notifications.slice(0, notifications.length - this.notifications.length);
-                newNotifications.forEach(notif => {
-                    if (!this.notifications.find(n => n.id === notif.id)) {
-                        this.addNotification(notif);
+            const currentNotifications = this.loadNotifications();
+            
+            // البحث عن إشعارات جديدة
+            currentNotifications.forEach(notif => {
+                if (!this.notifications.find(n => n.id === notif.id)) {
+                    console.log('🔔 إشعار جديد:', notif);
+                    
+                    // إضافة الإشعار الجديد
+                    this.addNotification(notif);
+                    
+                    // إذا كان إشعار دفع، أضف حجز جديد
+                    if (notif.type === 'payment' || notif.message.includes('دفع')) {
+                        const booking = {
+                            id: notif.id,
+                            personName: notif.personName,
+                            courseName: notif.courseName,
+                            amount: notif.amount,
+                            phone: '',
+                            bookingDate: new Date().toISOString().split('T')[0],
+                            notes: `تم الدفع عبر: ${notif.method || 'نظام الدفع'}`,
+                            createdAt: notif.timestamp,
+                            paymentStatus: 'completed'
+                        };
+                        
+                        if (!this.bookings.find(b => b.id === booking.id)) {
+                            this.bookings.push(booking);
+                            this.saveBookings();
+                            this.renderBookings();
+                            this.updateReports();
+                        }
                     }
-                });
+                }
+            });
+        }, 1000);
+    }
+
+    checkForNewNotifications() {
+        // دالة مساعدة للتحقق من الإشعارات الجديدة
+        const currentNotifications = this.loadNotifications();
+        currentNotifications.forEach(notif => {
+            if (!this.notifications.find(n => n.id === notif.id)) {
+                this.addNotification(notif);
+                this.playNotificationSound();
+                this.showNotificationAlert(notif);
             }
-        }, 2000);
+        });
+    }
+
+    playNotificationSound() {
+        // تشغيل صوت التنبيه
+        try {
+            // Create a beep sound using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 1000; // 1000 Hz
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+            console.log('لم يتمكن من تشغيل الصوت:', e.message);
+        }
+    }
+
+    showNotificationAlert(payment) {
+        // عرض تنبيه بصري جميل
+        const alertBox = document.createElement('div');
+        alertBox.className = 'booking-alert';
+        alertBox.innerHTML = `
+            <div class="alert-content">
+                <div class="alert-icon">✅</div>
+                <div class="alert-text">
+                    <h4>حجز جديد! 🎉</h4>
+                    <p><strong>${payment.personName}</strong> دفع ${payment.amount} جنيه</p>
+                    <p class="alert-course">${payment.courseName}</p>
+                </div>
+                <button class="alert-close" onclick="this.parentElement.parentElement.remove()">✕</button>
+            </div>
+        `;
+        
+        document.body.appendChild(alertBox);
+        
+        // إزالة التنبيه بعد 5 ثواني
+        setTimeout(() => {
+            if (alertBox.parentElement) {
+                alertBox.remove();
+            }
+        }, 5000);
     }
 }
 
