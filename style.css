@@ -248,7 +248,7 @@ body {
 .payment-btn-header:active {
     transform: translateY(0);
 }
-}
+
 
 /* Tabs Navigation */
 .tabs-nav {
