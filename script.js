@@ -266,6 +266,7 @@ class BookingManager {
             amount,
             bookingDate,
             notes,
+            paymentStatus: 'completed',
             createdAt: new Date().toLocaleString('ar-EG')
         };
 
