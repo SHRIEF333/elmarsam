@@ -1,1 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة الدفع - المرسم</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .payment-page {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 35px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .payment-header h1 {
+            color: #2c3e50;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .payment-header p {
+            color: #6c757d;
+            font-size: 1.05em;
+        }
+
+        .payment-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .payment-form .form-group {
+            margin-bottom: 25px;
+        }
+
+        .payment-form label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+
+        .payment-form input,
+        .payment-form select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .payment-form input:focus,
+        .payment-form select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Payment Methods Section */
+        .payment-methods {
+            margin: 30px 0;
+            padding: 25px;
+            background: white;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .payment-methods label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+
+        .method-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .method-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .method-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .method-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+
+        .method-option input[type="radio"]:checked + .method-label {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .method-option.selected {
+            border-color: #667eea;
+            background: #f0f3ff;
+        }
+
+        .method-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 1.05em;
+        }
+
+        .method-icon {
+            font-size: 1.8em;
+        }
+
+        .payment-summary {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border: 2px solid #e9ecef;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+            color: #2c3e50;
+            font-size: 1.05em;
+        }
+
+        .summary-row.total {
+            font-weight: 700;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            margin-top: 15px;
+            padding-top: 15px;
+            color: #667eea;
+        }
+
+        .payment-btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.15em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 25px;
+        }
+
+        .payment-btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .payment-btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .success-message {
+            display: none;
+            background: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #28a745;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="payment-page">
+
+        <div class="payment-header">
+            <h1>💳 صفحة الدفع</h1>
+            <p>أتمم عملية الدفع للتسجيل في الكورس</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            ✅ تم الدفع بنجاح! تم إضافة الحجز إلى النظام
+        </div>
+
+        <form class="payment-form" id="paymentForm">
+            <div class="form-group">
+                <label for="paymentPersonName">اسم المشترك *</label>
+                <input type="text" id="paymentPersonName" required placeholder="أدخل اسمك الكامل">
+            </div>
+
+            <div class="form-group">
+                <label for="paymentCourseName">اختر الكورس *</label>
+                <select id="paymentCourseName" required>
+                    <option value="">-- اختر كورس --</option>
+                    <option value="🎨 مستوى اول (4 حصص) - 100 ج">🎨 مستوى اول (4 حصص) - 100 ج</option>
+                    <option value="🎨 مستوى ثاني (4 حصص) - 120 ج">🎨 مستوى ثاني (4 حصص) - 120 ج</option>
+                    <option value="🎨 مستوى ثالث (4 حصص) - 120 ج">🎨 مستوى ثالث (4 حصص) - 120 ج</option>
+                    <option value="🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج">🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentAmount">المبلغ (جنيه) *</label>
+                <select id="paymentAmount" required>
+                    <option value="">-- اختر المبلغ --</option>
+                    <option value="100">100 جنيه</option>
+                    <option value="120">120 جنيه</option>
+                    <option value="150">150 جنيه</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="paymentPhone">رقم الهاتف</label>
+                <input type="tel" id="paymentPhone" placeholder="رقم هاتفك (اختياري)">
+            </div>
+
+            <!-- Payment Methods Selection -->
+            <div class="payment-methods">
+                <label>طريقة الدفع *</label>
+                <div class="method-options">
+                    <div class="method-option" data-method="vodafone">
+                        <input type="radio" id="method-vodafone" name="paymentMethod" value="vodafone" required>
+                        <label for="method-vodafone" class="method-label">
+                            <span class="method-icon">📱</span>
+                            <span>فودافون كاش</span>
+                        </label>
+                    </div>
+
+                    <div class="method-option" data-method="instapay">
+                        <input type="radio" id="method-instapay" name="paymentMethod" value="instapay">
+                        <label for="method-instapay" class="method-label">
+                            <span class="method-icon">🏪</span>
+                            <span>إنستاباي</span>
+                        </label>
+                    </div>
+
+                    <div class="method-option" data-method="fawry">
+                        <input type="radio" id="method-fawry" name="paymentMethod" value="fawry">
+                        <label for="method-fawry" class="method-label">
+                            <span class="method-icon">🏠</span>
+                            <span>فوري</span>
+                        </label>
+                    </div>
+
+                    <div class="method-option" data-method="card">
+                        <input type="radio" id="method-card" name="paymentMethod" value="card">
+                        <label for="method-card" class="method-label">
+                            <span class="method-icon">💳</span>
+                            <span>بطاقة ائتمانية</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-summary">
+                <div class="summary-row">
+                    <span>الكورس:</span>
+                    <span id="summaryCourseName">--</span>
+                </div>
+                <div class="summary-row">
+                    <span>المبلغ:</span>
+                    <span id="summaryAmount">--</span>
+                </div>
+                <div class="summary-row">
+                    <span>طريقة الدفع:</span>
+                    <span id="summaryMethod">--</span>
+                </div>
+                <div class="summary-row total">
+                    <span>الإجمالي:</span>
+                    <span id="summaryTotal">0 جنيه</span>
+                </div>
+            </div>
+
+            <button type="submit" class="payment-btn-submit">✅ الخطوة التالية</button>
+        </form>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="payment.js"></script>
+</body>
+</html>
