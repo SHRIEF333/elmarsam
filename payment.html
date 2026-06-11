@@ -97,3 +97,40 @@
     </button>
 
 </form>
+
+<script>
+    function updateSummary() {
+
+    const course = document.getElementById("paymentCourseName").value;
+    const amount = document.getElementById("paymentAmount").value;
+
+    const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+    document.getElementById("summaryCourse").textContent = course || "--";
+    document.getElementById("summaryAmount").textContent = amount ? amount + " جنيه" : "--";
+    document.getElementById("summaryMethod").textContent = selectedMethod ? selectedMethod.value : "--";
+    document.getElementById("summaryTotal").textContent = amount ? amount + " جنيه" : "0 جنيه";
+}
+
+// listeners
+document.getElementById("paymentCourseName").addEventListener("change", updateSummary);
+document.getElementById("paymentAmount").addEventListener("input", updateSummary);
+
+document.querySelectorAll('input[name="paymentMethod"]').forEach(r => {
+    r.addEventListener("change", updateSummary);
+});
+
+// method UI click
+document.querySelectorAll(".method-option").forEach(el => {
+    el.addEventListener("click", function() {
+
+        document.querySelectorAll(".method-option").forEach(x => x.classList.remove("selected"));
+
+        this.classList.add("selected");
+
+        this.querySelector("input").checked = true;
+
+        updateSummary();
+    });
+});
+</script>
