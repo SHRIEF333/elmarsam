@@ -196,7 +196,18 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 40px 30px;
-    text-align: center;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-text {
+    flex: 1;
+    text-align: right;
 }
 
 .header h1 {
@@ -208,6 +219,35 @@ body {
 .header p {
     font-size: 1.1em;
     opacity: 0.9;
+}
+
+.payment-btn-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffc107;
+    color: #333;
+    padding: 12px 25px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05em;
+    transition: all 0.3s;
+    white-space: nowrap;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.payment-btn-header:hover {
+    background: #ff9800;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+}
+
+.payment-btn-header:active {
+    transform: translateY(0);
+}
 }
 
 /* Tabs Navigation */
@@ -782,5 +822,144 @@ body {
     .report-icon {
         font-size: 2em;
         min-width: 50px;
+    }
+}
+
+/* ==================== تنبيهات الحجوزات الجديدة ==================== */
+
+.booking-alert {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+    animation: slideInFromLeft 0.5s ease;
+    z-index: 10000;
+    min-width: 320px;
+    max-width: 400px;
+    border-left: 5px solid #fff;
+}
+
+.booking-alert .alert-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.booking-alert .alert-icon {
+    font-size: 2.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: bounce 0.6s ease;
+}
+
+.booking-alert .alert-text {
+    flex: 1;
+    text-align: right;
+}
+
+.booking-alert .alert-text h4 {
+    margin-bottom: 8px;
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.booking-alert .alert-text p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    line-height: 1.4;
+}
+
+.booking-alert .alert-course {
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 0.9em;
+}
+
+.booking-alert .alert-close {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.3em;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.booking-alert .alert-close:hover {
+    background: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* تنبيه بديل - أحمر للأخطاء */
+.booking-alert.error {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border-left-color: #fff;
+}
+
+/* تنبيه معلومات - أزرق */
+.booking-alert.info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+/* إضاءة الجدول عند إضافة حجز جديد */
+.booking-row.new-booking {
+    animation: highlightRow 1s ease;
+}
+
+@keyframes highlightRow {
+    0% {
+        background-color: #fff3cd;
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+/* Badge التنبيهات - تحديث */
+#notificationsBadge {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
     }
 }
