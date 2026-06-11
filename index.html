@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الحجوزات - المرسم</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Notifications Button -->
+        <div class="notifications-header">
+            <button class="notifications-btn" id="notificationsBtn">
+                <span class="notifications-icon">🔔</span>
+                <span class="notifications-badge" id="notificationsBadge">0</span>
+            </button>
+            <img src="elmarsam_logo.png" alt="المرسم" class="header-logo">
+        </div>
+
+        <!-- Notifications Panel -->
+        <div class="notifications-panel" id="notificationsPanel">
+            <div class="notifications-header-panel">
+                <h3>الإشعارات</h3>
+                <button class="clear-notifications" id="clearNotifications">مسح الكل</button>
+            </div>
+            <div class="notifications-list" id="notificationsList">
+                <p class="no-notifications">لا توجد إشعارات حالياً</p>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="header">
+            <h1>📚 نظام إدارة حجوزات الكورسات</h1>
+            <p>المرسم - نظام متكامل لإدارة الحجوزات والكورسات</p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="bookings">الحجوزات</button>
+            <button class="tab-btn" data-tab="add">إضافة حجز جديد</button>
+            <button class="tab-btn" data-tab="reports">التقارير والإحصائيات</button>
+        </nav>
+
+        <!-- Bookings Tab -->
+        <section class="tab-content active" id="bookings">
+            <div class="section-header">
+                <h2>📋 قائمة الحجوزات</h2>
+                <input type="text" id="searchInput" class="search-box" placeholder="ابحث بالاسم أو الكورس...">
+            </div>
+            
+            <div class="table-wrapper">
+                <table class="bookings-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>اسم الشخص</th>
+                            <th>اسم الكورس</th>
+                            <th>المبلغ المدفوع</th>
+                            <th>تاريخ الحجز</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTable">
+                    </tbody>
+                </table>
+                <div id="noData" class="no-data">
+                    لا توجد حجوزات حالياً
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Booking Tab -->
+        <section class="tab-content" id="add">
+            <div class="section-header">
+                <h2>➕ إضافة حجز جديد</h2>
+            </div>
+            
+            <form class="form-container" id="addBookingForm">
+                <div class="form-group">
+                    <label for="personName">اسم الشخص *</label>
+                    <input type="text" id="personName" required placeholder="أدخل اسم الشخص">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="courseName">اسم الكورس *</label>
+                        <div class="course-selector">
+                            <select id="courseName" required>
+                                <option value="">-- اختر كورس --</option>
+                                <option value="🎨 مستوى اول (4 حصص) - 100 ج">🎨 مستوى اول (4 حصص) - 100 ج</option>
+                                <option value="🎨 مستوى ثاني (4 حصص) - 120 ج">🎨 مستوى ثاني (4 حصص) - 120 ج</option>
+                                <option value="🎨 مستوى ثالث (4 حصص) - 120 ج">🎨 مستوى ثالث (4 حصص) - 120 ج</option>
+                                <option value="🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج">🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج</option>
+                            </select>
+                            <span class="course-icon">📚</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">المبلغ المدفوع (جنيه) *</label>
+                        <div class="course-selector">
+                            <select id="amount" required>
+                                <option value="">-- اختر المبلغ --</option>
+                                <option value="100">💵 100 جنيه</option>
+                                <option value="120">💵 120 جنيه</option>
+                                <option value="150">💵 150 جنيه</option>
+                            </select>
+                            <span class="course-icon">💳</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookingDate">تاريخ الحجز *</label>
+                    <input type="date" id="bookingDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">ملاحظات</label>
+                    <textarea id="notes" placeholder="أضف أي ملاحظات إضافية..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 إضافة الحجز</button>
+            </form>
+        </section>
+
+        <!-- Reports Tab -->
+        <section class="tab-content" id="reports">
+            <div class="section-header">
+                <h2>📊 التقارير والإحصائيات</h2>
+            </div>
+
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-icon">👥</div>
+                    <div class="report-content">
+                        <p class="report-label">عدد الحجوزات</p>
+                        <p class="report-value" id="totalBookings">0</p>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-icon">💰</div>
+                    <div class="report-content">
+                        <p class="report-label">إجمالي المبالغ المدفوعة</p>
+                        <p class="report-value" id="totalAmount">0 ج.م</p>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-icon">📚</div>
+                    <div class="report-content">
+                        <p class="report-label">عدد الكورسات المختلفة</p>
+                        <p class="report-value" id="uniqueCourses">0</p>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-icon">👤</div>
+                    <div class="report-content">
+                        <p class="report-label">أعلى حجز</p>
+                        <p class="report-value" id="maxBooking">0 ج.م</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>📌 الكورسات الأكثر حجزاً</h3>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الكورس</th>
+                                <th>عدد الحجوزات</th>
+                                <th>المجموع</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coursesStats">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="chart-card">
+                    <h3>💵 أعلى المبالغ المدفوعة</h3>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>اسم الشخص</th>
+                                <th>الكورس</th>
+                                <th>المبلغ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topPayments">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>✏️ تعديل الحجز</h2>
+            
+            <form id="editBookingForm">
+                <div class="form-group">
+                    <label for="editPersonName">اسم الشخص *</label>
+                    <input type="text" id="editPersonName" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCourseName">اسم الكورس *</label>
+                        <div class="course-selector">
+                            <select id="editCourseName" required>
+                                <option value="">-- اختر كورس --</option>
+                                <option value="🎨 مستوى اول (4 حصص) - 100 ج">🎨 مستوى اول (4 حصص) - 100 ج</option>
+                                <option value="🎨 مستوى ثاني (4 حصص) - 120 ج">🎨 مستوى ثاني (4 حصص) - 120 ج</option>
+                                <option value="🎨 مستوى ثالث (4 حصص) - 120 ج">🎨 مستوى ثالث (4 حصص) - 120 ج</option>
+                                <option value="🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج">🎨 مستوى متقدم واساسيات بورتريه (4 حصص) - 150 ج</option>
+                            </select>
+                            <span class="course-icon">📚</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editAmount">المبلغ المدفوع (جنيه) *</label>
+                        <div class="course-selector">
+                            <select id="editAmount" required>
+                                <option value="">-- اختر المبلغ --</option>
+                                <option value="100">💵 100 جنيه</option>
+                                <option value="120">💵 120 جنيه</option>
+                                <option value="150">💵 150 جنيه</option>
+                            </select>
+                            <span class="course-icon">💳</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editBookingDate">تاريخ الحجز *</label>
+                    <input type="date" id="editBookingDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editNotes">ملاحظات</label>
+                    <textarea id="editNotes"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 حفظ التعديلات</button>
+                <button type="button" class="btn btn-secondary" id="cancelEdit">إلغاء</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content confirm-modal">
+            <h2>⚠️ تأكيد الحذف</h2>
+            <p>هل أنت متأكد من رغبتك في حذف هذا الحجز؟</p>
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="confirmDelete">حذف</button>
+                <button class="btn btn-secondary" id="cancelDelete">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
